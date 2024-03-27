@@ -13,7 +13,7 @@ router = APIRouter()
 @router.get(
     "/surftimer/playerprofile",
     name="Get Player Profile",
-    tags=["Players"],
+    tags=["Player Profile"],
     summary="All player profile information",
     response_model=PlayerProfile,
 )
@@ -57,7 +57,7 @@ async def getPlayerProfileData(
 @router.post(
     "/surftimer/insertplayer",
     name="Insert Player",
-    tags=["Players"],
+    tags=["Player Profile"],
     response_model=PostResponeData,
     summary="Adds a new player profile entry",
 )
@@ -113,7 +113,7 @@ async def insertPlayer(
 @router.put(
     "/surftimer/updateplayerprofile",
     name="Update Player Profile",
-    tags=["Players"],
+    tags=["Player Profile"],
     response_model=PostResponeData,
     summary="Update the already existing player profile",
 )
