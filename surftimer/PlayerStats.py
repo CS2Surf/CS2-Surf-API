@@ -2,7 +2,6 @@ from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
-from pydantic import BaseModel, validator
 import simplejson as json
 import time, surftimer.queries
 

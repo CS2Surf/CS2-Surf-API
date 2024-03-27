@@ -51,3 +51,22 @@ class CurrentRun(BaseModel):
     def default_timestamp(cls, v):
         """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
         return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+
+
+class MapModel(BaseModel):
+    """Body for adding or updating **Map** entry"""
+
+    id: int = None
+    mapname: str
+    author: str = "Unknown"
+    tier: int
+    stages: int
+    bonuses: int = 0
+    ranked: int = 0
+    date_added: int = None
+    last_played: int = None
+
+    @validator("date_added", "last_played", pre=True, always=True)
+    def default_timestamp(cls, v):
+        """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
+        return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
