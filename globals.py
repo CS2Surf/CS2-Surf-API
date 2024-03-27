@@ -33,6 +33,10 @@ tags_metadata = [
         "name": "Map",
         "description": "All queries from the `Map.cs` file.",
     },
+    {
+        "name": "Player Stats",
+        "description": "All queries from the `PlayerStats.cs` file.",
+    },
 ]
 
 # Whitelisted IPs

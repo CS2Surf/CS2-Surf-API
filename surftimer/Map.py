@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 from sql import selectQuery, insertQuery
 from globals import get_cache, set_cache
 from pydantic import BaseModel, validator
-from decimal import Decimal
 import simplejson as json
 import time, datetime, surftimer.queries
 
@@ -90,8 +89,8 @@ async def insertMap(
     """
     tic = time.perf_counter()
 
-    print(data)
-    return data
+    # print(data)
+    # return data
 
     xquery = insertQuery(
         surftimer.queries.sql_insertMap.format(
@@ -140,8 +139,8 @@ async def updateMapTier(
     """
     tic = time.perf_counter()
 
-    print(data)
-    return data
+    # print(data)
+    # return data
 
     xquery = insertQuery(
         surftimer.queries.sql_updateMap.format(
@@ -167,7 +166,6 @@ async def updateMapTier(
     response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
-
 
 
 @router.get(
@@ -216,13 +214,16 @@ async def selectMapRunsData(
     else:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
-    
-    for item in xquery:
-        # Execute query to fetch checkpoints using the id from the current item
-        checkpoints = selectQuery(surftimer.queries.sql_getMapCheckpointsData.format(item['id']))
-        
-        # Append checkpoints to the current item
-        item['checkpoints'] = checkpoints
+
+    if type == 0:  # 0 = map times
+        for item in xquery:
+            # Execute query to fetch checkpoints using the id from the current item
+            checkpoints = selectQuery(
+                surftimer.queries.sql_getMapCheckpointsData.format(item["id"])
+            )
+
+            # Append checkpoints to the current item
+            item["checkpoints"] = checkpoints
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
