@@ -1,3 +1,6 @@
+# PLEASE DO NOT USE THIS, IT IS NOT COMPLETE AND IS AN ACTIVE WORK-IN-PROGRESS. ISSUES HAVE BEEN DISABLED FOR THIS REASON. 
+## Please join the Discord: https://discord.cs.surf
+
 ## Pre-Requisites
 - Install dependencies `pip install -r requirements.txt`
 - Copy/rename `config.json.example` to `config.json` and populate
