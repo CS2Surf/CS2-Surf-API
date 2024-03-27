@@ -24,6 +24,7 @@ from globals import (
 # Import all the endpoints for each table
 from surftimer.Map import router as Map
 from surftimer.PlayerStats import router as PlayerStats
+from surftimer.CurrentRun import router as CurrentRun
 
 
 class IPValidatorMiddleware(BaseHTTPMiddleware):
@@ -73,6 +74,7 @@ app = FastAPI(
 # Attach the routes
 app.include_router(Map)
 app.include_router(PlayerStats)
+app.include_router(CurrentRun)
 
 
 @app.get("/docs2", include_in_schema=False)

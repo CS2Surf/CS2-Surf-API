@@ -13,6 +13,7 @@ router = APIRouter()
     "/surftimer/playermapdata",
     name="Get Player Map Data - All runs",
     tags=["Player Stats"],
+    summary="Combines `LoadMapTimesData` and `LoadCheckpointsData` queries into a single endpoint",
 )
 async def getPlayerMapData(
     request: Request,
@@ -22,8 +23,6 @@ async def getPlayerMapData(
 ):
     """
     # **All** data for the player runs on a map.
-    \n\n
-    Combines `LoadMapTimesData` and `LoadCheckpointsData` queries into a single endpoint
     """
     tic = time.perf_counter()
 

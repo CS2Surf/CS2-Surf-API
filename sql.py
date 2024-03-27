@@ -43,10 +43,13 @@ def insertQuery(query):
 
     mydb.commit()
 
-    return mycursor.rowcount
+    # Get the last auto-incremented value
+    last_inserted_id = mycursor.lastrowid
+
+    return mycursor.rowcount, last_inserted_id
 
 
-def insert_escaped_query(query):
+def insertEscapedQuery(query):
     """Executes `INSERT` query `mycursor.execute("", (query))` provided and returns `mycursor.rowcount`\n
     Connects to a predefined `Database` from `config.json`"""
     db = config["DATABASE"]
@@ -62,20 +65,43 @@ def insert_escaped_query(query):
 
     mydb.commit()
 
-    return mycursor.rowcount
+    # Get the last auto-incremented value
+    last_inserted_id = mycursor.lastrowid
+
+    return mycursor.rowcount, last_inserted_id
 
 
-def syncQuery(query):
-    db = config["DATABASE"]
+def executeTransaction(queries):
+    """Executes multiple queries within a single transaction and returns the row counts"""
+    db_config = config["DATABASE"]
     mydb = mysql.connector.connect(
-        host=db["HOST"],
-        user=db["USERNAME"],
-        password=db["PASSWORD"],
+        host=db_config["HOST"],
+        user=db_config["USERNAME"],
+        password=db_config["PASSWORD"],
+        database=db_config["DB"],
     )
 
-    mycursor = mydb.cursor()
-    mycursor.execute(query)
+    try:
+        mycursor = mydb.cursor()
 
-    mydb.commit()
+        # Start a transaction
+        mydb.start_transaction()
 
-    return mycursor.rowcount
+        row_counts = []
+
+        for query in queries:
+            mycursor.execute(query)
+            row_counts.append(mycursor.rowcount)
+
+        # Commit the transaction
+        mydb.commit()
+
+        return row_counts
+
+    except Exception as e:
+        # Rollback the transaction if an error occurs
+        mydb.rollback()
+        raise e
+
+    finally:
+        mydb.close()

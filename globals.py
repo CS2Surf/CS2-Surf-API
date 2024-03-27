@@ -37,6 +37,10 @@ tags_metadata = [
         "name": "Player Stats",
         "description": "All queries from the `PlayerStats.cs` file.",
     },
+    {
+        "name": "Current Run",
+        "description": "All queries from the `CurrentRun.cs` file.",
+    },
 ]
 
 # Whitelisted IPs

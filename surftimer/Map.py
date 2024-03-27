@@ -5,6 +5,7 @@ from globals import get_cache, set_cache
 from pydantic import BaseModel, validator
 import simplejson as json
 import time, datetime, surftimer.queries
+from models import *
 
 
 router = APIRouter()
@@ -33,6 +34,7 @@ class MapModel(BaseModel):
     "/surftimer/mapinfo",
     name="Get Map Info",
     tags=["Map"],
+    summary="All map info available for the map",
 )
 async def selectMapInfo(
     request: Request,
@@ -75,6 +77,8 @@ async def selectMapInfo(
     "/surftimer/insertmap",
     name="Insert Map",
     tags=["Map"],
+    response_model=PostResponeData,
+    summary="Adds a new map entry",
 )
 async def insertMap(
     request: Request,
@@ -103,9 +107,12 @@ async def insertMap(
             data.last_played,
         )
     )
+    row_count, last_inserted_id = xquery
 
-    content_data = {"inserted": xquery, "xtime": time.perf_counter() - tic}
-    if xquery < 1:
+    content_data = PostResponeData(
+        row_count, time.perf_counter() - tic, last_inserted_id
+    )
+    if row_count < 1:
         response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
         return response
@@ -123,6 +130,8 @@ async def insertMap(
     "/surftimer/updateMap",
     name="Update Map",
     tags=["Map"],
+    response_model=PostResponeData,
+    summary="This is a single endpoint to update the data of the map, we will always update `stages`, `bonuses` values (full update) instead of the current way the plugin does it (full or partial update).",
 )
 async def updateMapTier(
     request: Request,
@@ -133,7 +142,6 @@ async def updateMapTier(
     $"UPDATE Maps SET last_played={(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, stages={this.Stages}, bonuses={this.Bonuses} WHERE id={this.ID}";
     ....
     ```
-    This is a single endpoint to update the data of the map, we will always update `stages`, `bonuses` values (full update) instead of the current way the plugin does it (full or partial update).\n
     `last_played` value is automatically populated from the API as UNIX timestamp.\n
     `id` is required here.
     """
@@ -150,9 +158,12 @@ async def updateMapTier(
             data.id,
         )
     )
+    row_count, last_inserted_id = xquery
 
-    content_data = {"updated": xquery, "xtime": time.perf_counter() - tic}
-    if xquery < 1:
+    content_data = PostResponeData(
+        row_count, time.perf_counter() - tic, last_inserted_id
+    )
+    if row_count < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
         response.headers["content-type"] = "application/json"
         response.status_code = status.HTTP_304_NOT_MODIFIED
@@ -172,6 +183,7 @@ async def updateMapTier(
     "/surftimer/maprunsdata",
     name="Get Map Runs Data",
     tags=["Map"],
+    summary="All the runs on the given **MapID**, **Style** and **Type** combo.",
 )
 async def selectMapRunsData(
     request: Request,
@@ -192,7 +204,6 @@ async def selectMapRunsData(
         ORDER BY MapTimes.run_time ASC;
     ");
     ```
-    Will return a `List` of JSON objects for all the runs on the given **MapID**, **Style** and **Type** combo.\n
     This also includes the `Checkpoints` data for each of the runs.
     """
     tic = time.perf_counter()
