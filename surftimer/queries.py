@@ -35,3 +35,14 @@ sql_insertCheckpoint = """INSERT INTO `Checkpoints`
                     ON DUPLICATE KEY UPDATE 
                     run_time=VALUES(run_time), start_vel_x=VALUES(start_vel_x), start_vel_y=VALUES(start_vel_y), start_vel_z=VALUES(start_vel_z), 
                     end_vel_x=VALUES(end_vel_x), end_vel_y=VALUES(end_vel_y), end_vel_z=VALUES(end_vel_z), attempts=VALUES(attempts), end_touch=VALUES(end_touch);"""
+
+
+####################
+##   Players.cs   ##
+####################
+sql_getPlayerProfileData = "SELECT * FROM `Player` WHERE `steam_id` = {} LIMIT 1;"
+sql_insertPlayerProfile = """INSERT INTO `Player` (`name`, `steam_id`, `country`, `join_date`, `last_seen`, `connections`) 
+                            VALUES ('{MySqlHelper.EscapeString(name)}', {}, '{}', {}, {}, {});"""
+sql_updatePlayerProfile = """UPDATE `Player` SET country = '{}', 
+                            `last_seen` = {}, `connections` = `connections` + 1 
+                            WHERE `id` = {} eeeeeeeee;"""

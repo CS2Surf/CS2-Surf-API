@@ -25,10 +25,12 @@ from globals import (
 from surftimer.Map import router as Map
 from surftimer.PlayerStats import router as PlayerStats
 from surftimer.CurrentRun import router as CurrentRun
+from surftimer.Players import router as Players
 
 
 class IPValidatorMiddleware(BaseHTTPMiddleware):
     """This will check whether the Request IP is in our `WHITELISTED_IPS` and let it through or return status code `400` if not in `WHITELISTED_IPS`"""
+
     async def dispatch(self, request: Request, call_next):
         # Get client IP
         ip = str(request.client.host)
@@ -75,6 +77,7 @@ app = FastAPI(
 app.include_router(Map)
 app.include_router(PlayerStats)
 app.include_router(CurrentRun)
+app.include_router(Players)
 
 
 @app.get("/docs2", include_in_schema=False)

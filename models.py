@@ -50,14 +50,16 @@ class CurrentRun(BaseModel):
     @validator("run_date", pre=True, always=True)
     def default_timestamp(cls, v):
         """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
-        return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+        if v is None:
+            return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+        return v
 
 
 class MapModel(BaseModel):
     """Body for adding or updating **Map** entry"""
 
     id: int = None
-    mapname: str
+    name: str
     author: str = "Unknown"
     tier: int
     stages: int
@@ -69,4 +71,24 @@ class MapModel(BaseModel):
     @validator("date_added", "last_played", pre=True, always=True)
     def default_timestamp(cls, v):
         """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
-        return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+        if v is None:
+            return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+        return v
+
+
+class PlayerProfile(BaseModel):
+    """Model for player profiles"""
+
+    name: str
+    steam_id: int
+    country: str
+    join_date: int
+    last_seen: int
+    connections: int
+
+    @validator("join_date", "last_seen", pre=True, always=True)
+    def default_timestamp(cls, v):
+        """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
+        if v is None:
+            return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+        return v

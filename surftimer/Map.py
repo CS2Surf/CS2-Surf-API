@@ -15,6 +15,7 @@ router = APIRouter()
     name="Get Map Info",
     tags=["Map"],
     summary="All map info available for the map",
+    response_model=MapModel
 )
 async def selectMapInfo(
     request: Request,
@@ -50,7 +51,7 @@ async def selectMapInfo(
 
     print(f"Execution time {toc - tic:0.4f}")
 
-    return xquery
+    return MapModel(**xquery)
 
 
 @router.post(
@@ -78,7 +79,7 @@ async def insertMap(
 
     xquery = insertQuery(
         surftimer.queries.sql_insertMap.format(
-            data.mapname,
+            data.name,
             data.author,
             data.tier,
             data.stages,
