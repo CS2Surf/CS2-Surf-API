@@ -1,0 +1,7 @@
+**/__pycache__/
+.vscode
+venv
+requests.json
+denied.json
+config.json
+test.py

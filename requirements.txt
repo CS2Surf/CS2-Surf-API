@@ -1,0 +1,9 @@
+fastapi
+paramiko
+pydantic
+uvicorn
+simplejson
+mysql-connector
+mysql-connector-python
+pyjwt
+redis

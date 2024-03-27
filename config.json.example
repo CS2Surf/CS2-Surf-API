@@ -1,0 +1,28 @@
+{
+  "AUTH0": {
+    "DOMAIN": "",
+    "API_AUDIENCE": "",
+    "ALGORITHMS": "",
+    "ISSUER": ""
+  },
+
+  "DATABASE": {
+    "USERNAME": "",
+    "PASSWORD": "",
+    "HOST": "",
+    "DB": ""
+  },
+
+  "REDIS": {
+    "ENABLED": 1,
+    "HOST": "",
+    "PASSWORD": "",
+    "PORT": 6379,
+    "EXPIRY": 30
+  },
+
+  "WHITELISTED_IPS": [
+    "127.0.0.1",
+    "",
+  ]
+}
