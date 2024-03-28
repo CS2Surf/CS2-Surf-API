@@ -1,0 +1,63 @@
+name: Deploy
+
+on:
+  check_run:
+    types: [requested_action, rerequested]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  #on:
+  #  push:
+  #    branches:
+  #      - main
+
+jobs:
+  workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Remove directories
+        run: rm -r .github .git
+
+      - name: Upload files
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          port: ${{ secrets.SFTP_PORT }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASS }}
+          local_path: './'
+          remote_path: './'
+          sftp_only: true
+
+      - name: Stop the Pterodactyl server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "stop" }'
+
+      - name: Kill the Pterodactyl server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "kill" }'
+
+      - name: Start the Pterodactyl server
+        shell: bash
+        run: |
+          curl --request POST \
+            --url ${{ secrets.BASE_URL }}api/client/servers/${{ secrets.SERVER_ID }}/power \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.API_KEY }}' \
+            --header 'Content-Type: application/json' \
+            --data '{ "signal": "start" }'
