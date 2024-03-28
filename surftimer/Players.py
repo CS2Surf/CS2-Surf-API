@@ -11,18 +11,22 @@ router = APIRouter()
 
 
 @router.get(
-    "/surftimer/playerprofile",
+    "/surftimer/playersurfprofile/{steamid}",
     name="Get Player Profile",
     tags=["Player Profile"],
     summary="All player profile information",
-    response_model=PlayerProfile,
+    response_model=PlayerSurfProfile,
 )
 async def getPlayerProfileData(
     request: Request,
     response: Response,
     steamid: int,
 ):
-    """`Task<MySqlDataReader> dbTask = DB.Query($"SELECT * FROM `Player` WHERE `steam_id` = {player.SteamID} LIMIT 1;");`"""
+    """
+    ```
+    Task<MySqlDataReader> dbTask = DB.Query($"SELECT * FROM `Player` WHERE `steam_id` = {player.SteamID} LIMIT 1;");
+    ```
+    """
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
@@ -51,7 +55,8 @@ async def getPlayerProfileData(
 
     print(f"Execution time {toc - tic:0.4f}")
 
-    return PlayerProfile(**xquery)
+    response_data = PlayerSurfProfile(**xquery).model_dump()
+    return JSONResponse(content=response_data)
 
 
 @router.post(
@@ -64,22 +69,20 @@ async def getPlayerProfileData(
 async def insertPlayer(
     request: Request,
     response: Response,
-    data: PlayerProfile,
+    data: PlayerSurfProfile,
 ):
-    """```c
-                // Write new player to database
-                Task<int> newPlayerTask = DB.Write($@"
-                    INSERT INTO `Player` (`name`, `steam_id`, `country`, `join_date`, `last_seen`, `connections`)
-                    VALUES ('{MySqlHelper.EscapeString(name)}', {player.SteamID}, '{country}', {joinDate}, {lastSeen}, {connections});
-                ");
+    """
+    ```c
+    // Write new player to database
+    Task<int> newPlayerTask = DB.Write($@"
+        INSERT INTO `Player` (`name`, `steam_id`, `country`, `join_date`, `last_seen`, `connections`)
+        VALUES ('{MySqlHelper.EscapeString(name)}', {player.SteamID}, '{country}', {joinDate}, {lastSeen}, {connections});
+    ");
     ....
     ```
     `join_date` and `last_seen` values are automatically populated from the API as UNIX timestamps
     """
     tic = time.perf_counter()
-
-    # print(data)
-    # return data
 
     xquery = insertQuery(
         surftimer.queries.sql_insertPlayerProfile.format(
@@ -124,21 +127,18 @@ async def updatePlayerProfile(
     id: int,
 ):
     """```c
-                // Update data in Player DB table
-                Task<int> updatePlayerTask = DB.Write($@"
-                    UPDATE `Player` SET country = '{playerList[player.UserId ?? 0].Profile.Country}',
-                    `last_seen` = {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, `connections` = `connections` + 1
-                    WHERE `id` = {playerList[player.UserId ?? 0].Profile.ID} LIMIT 1;
-                ");
+    // Update data in Player DB table
+    Task<int> updatePlayerTask = DB.Write($@"
+        UPDATE `Player` SET country = '{playerList[player.UserId ?? 0].Profile.Country}',
+        `last_seen` = {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, `connections` = `connections` + 1
+        WHERE `id` = {playerList[player.UserId ?? 0].Profile.ID} LIMIT 1;
+    ");
     ....
     ```
     `last_played` value is automatically populated from the API as UNIX timestamp.\n
     `id` is required here.
     """
     tic = time.perf_counter()
-
-    # print(data)
-    # return data
 
     xquery = insertQuery(
         surftimer.queries.sql_updatePlayerProfile.format(

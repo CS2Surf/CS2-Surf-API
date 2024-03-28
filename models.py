@@ -43,7 +43,7 @@ class CurrentRun(BaseModel):
     style: int = 0
     type: int = 0
     stage: int = 0
-    checkpoints: List[Checkpoint] = None
+    checkpoints: Optional[List[Checkpoint]] = None  # Required when adding a Map Run Time (type = 0)
     replay_frames: str
     run_date: Optional[int] = None
 
@@ -55,7 +55,7 @@ class CurrentRun(BaseModel):
         return v
 
 
-class MapModel(BaseModel):
+class MapInfoModel(BaseModel):
     """Body for adding or updating **Map** entry"""
 
     id: int = None
@@ -76,7 +76,7 @@ class MapModel(BaseModel):
         return v
 
 
-class PlayerProfile(BaseModel):
+class PlayerSurfProfile(BaseModel):
     """Model for player profiles"""
 
     name: str

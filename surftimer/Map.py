@@ -15,7 +15,7 @@ router = APIRouter()
     name="Get Map Info",
     tags=["Map"],
     summary="All map info available for the map",
-    response_model=MapModel
+    response_model=MapInfoModel,
 )
 async def selectMapInfo(
     request: Request,
@@ -51,7 +51,8 @@ async def selectMapInfo(
 
     print(f"Execution time {toc - tic:0.4f}")
 
-    return MapModel(**xquery)
+    response_data = MapInfoModel(**xquery).model_dump()
+    return JSONResponse(content=response_data)
 
 
 @router.post(
@@ -64,7 +65,7 @@ async def selectMapInfo(
 async def insertMap(
     request: Request,
     response: Response,
-    data: MapModel,
+    data: MapInfoModel,
 ):
     """```c
     Task<int> writer = DB.Write($"INSERT INTO Maps (name, author, tier, stages, ranked, date_added, last_played) VALUES ('{MySqlHelper.EscapeString(Name)}', 'Unknown', {this.Stages}, {this.Bonuses}, 0, {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()})");
@@ -73,9 +74,6 @@ async def insertMap(
     `date_added` and `last_played` values are automatically populated from the API as UNIX timestamps
     """
     tic = time.perf_counter()
-
-    # print(data)
-    # return data
 
     xquery = insertQuery(
         surftimer.queries.sql_insertMap.format(
@@ -118,19 +116,17 @@ async def insertMap(
 async def updateMapTier(
     request: Request,
     response: Response,
-    data: MapModel,
+    data: MapInfoModel,
 ):
-    """```c
+    """
+    # **id** is required here (maptime_id)
+    ```c
     $"UPDATE Maps SET last_played={(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, stages={this.Stages}, bonuses={this.Bonuses} WHERE id={this.ID}";
     ....
     ```
     `last_played` value is automatically populated from the API as UNIX timestamp.\n
-    `id` is required here.
     """
     tic = time.perf_counter()
-
-    # print(data)
-    # return data
 
     xquery = insertQuery(
         surftimer.queries.sql_updateMap.format(
@@ -165,7 +161,7 @@ async def updateMapTier(
     "/surftimer/maprunsdata",
     name="Get Map Runs Data",
     tags=["Map"],
-    summary="All the runs on the given **MapID**, **Style** and **Type** combo.",
+    summary="All the runs for the given **MapID**, **Style** and **Type** combo.",
 )
 async def selectMapRunsData(
     request: Request,
@@ -176,6 +172,9 @@ async def selectMapRunsData(
 ):
     """
     # **Type** is now required
+    ## 0 = map time;
+    ## 1 = bonus time (`stage` signifies bonus number);
+    ## 2 = stage time (`stage` signifies stage number);
     ```
     // Get map world records
     Task<MySqlDataReader> reader = DB.Query($@"
@@ -186,7 +185,7 @@ async def selectMapRunsData(
         ORDER BY MapTimes.run_time ASC;
     ");
     ```
-    This also includes the `Checkpoints` data for each of the runs.
+    This also includes the `Checkpoints` data for each of the runs if the **type** is **0**.
     """
     tic = time.perf_counter()
 
@@ -202,9 +201,7 @@ async def selectMapRunsData(
 
     xquery = selectQuery(surftimer.queries.sql_getMapRunsData.format(id, style, type))
 
-    if xquery:
-        xquery = xquery
-    else:
+    if not xquery:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 
@@ -222,7 +219,5 @@ async def selectMapRunsData(
     set_cache(cache_key, xquery)
 
     toc = time.perf_counter()
-
     print(f"Execution time {toc - tic:0.4f}")
-
     return xquery
