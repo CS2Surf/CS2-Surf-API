@@ -83,6 +83,7 @@ async def insertMap(
             data.author,
             data.tier,
             data.stages,
+            data.bonuses,
             data.ranked,
             data.date_added,
             data.last_played,

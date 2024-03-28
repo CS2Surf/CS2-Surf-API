@@ -2,8 +2,8 @@
 ## Map.cs ##
 ############
 sql_getMapInfo = "SELECT * FROM Maps WHERE name='{}';"
-sql_insertMap = """INSERT INTO Maps (name, author, tier, stages, ranked, date_added, last_played) 
-                VALUES ('{}', '{}', {}, {}, {}, {}, {});"""
+sql_insertMap = """INSERT INTO Maps (name, author, tier, stages, bonuses, ranked, date_added, last_played) 
+                VALUES ('{}', '{}', {}, {}, {}, {}, {}, {});"""
 sql_updateMap = """UPDATE Maps SET last_played={}, stages={}, bonuses={} WHERE id={};"""
 sql_getMapRunsData = """SELECT MapTimes.*, Player.name FROM MapTimes
                     JOIN Player ON MapTimes.player_id = Player.id
