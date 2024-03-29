@@ -276,3 +276,48 @@ async def selectMapRecordAndTotals(
     print(f"Execution time {toc - tic:0.4f}")
 
     return xquery
+
+
+@router.get(
+    "/surftimer/mapcheckpointsdata",
+    name="Get Map Checkpoints Data",
+    tags=["Map"],
+    summary="All map checkpoints data for the given **MapTime_ID**.",
+)
+async def selectMapCheckpointsData(
+    request: Request,
+    response: Response,
+    maptime_id: int,
+):
+    """
+    ```
+
+    ```
+    """
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectMapCheckpointsData:{maptime_id}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_getMapCheckpointsData.format(maptime_id))
+
+    if not xquery:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
