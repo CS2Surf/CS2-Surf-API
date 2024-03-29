@@ -5,6 +5,7 @@ from globals import get_cache, set_cache
 import simplejson as json
 import time, datetime, surftimer.queries
 from models import *
+from typing import List, Dict, Any
 
 
 router = APIRouter()
@@ -162,6 +163,7 @@ async def updateMapTier(
     name="Get Map Runs Data",
     tags=["Map"],
     summary="All the runs for the given **MapID**, **Style** and **Type** combo.",
+    response_model=List[Dict[str, Any]]
 )
 async def selectMapRunsData(
     request: Request,
