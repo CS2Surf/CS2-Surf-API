@@ -4,7 +4,7 @@ from typing import List, Optional
 import datetime
 
 
-class PostResponeData(BaseModel):
+class PostResponseData(BaseModel):
     """Response body for POST (INSERT) actions"""
 
     inserted: int

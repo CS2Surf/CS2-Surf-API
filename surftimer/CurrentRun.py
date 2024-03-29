@@ -15,7 +15,7 @@ router = APIRouter()
     "/surftimer/savemaptime",
     name="Save Map Time",
     tags=["Current Run"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="Combines `SaveMapTime` and `SaveCurrentRunCheckpoints`",
 )
 async def saveMapTime(
@@ -73,7 +73,7 @@ async def saveMapTime(
     # Start the transaction with all checkpoints
     trx = executeTransaction(checkpoint_queries)
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id, trx
     )
     if row_count < 1:
@@ -94,7 +94,7 @@ async def saveMapTime(
     "/surftimer/savestagetime",
     name="Save Stage Time",
     tags=["Current Run"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="Saves a stage run time",
 )
 async def saveStageTime(
@@ -131,7 +131,7 @@ async def saveStageTime(
     )
     row_count, last_inserted_id = xquery
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id
     )
     if row_count < 1:
@@ -151,7 +151,7 @@ async def saveStageTime(
     "/surftimer/savebonustime",
     name="Save Bonus Time",
     tags=["Current Run"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="Saves a bonus run time",
 )
 async def saveBonusTime(
@@ -188,7 +188,7 @@ async def saveBonusTime(
     )
     row_count, last_inserted_id = xquery
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id
     )
     if row_count < 1:

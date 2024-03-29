@@ -60,7 +60,7 @@ async def selectMapInfo(
     "/surftimer/insertmap",
     name="Insert Map",
     tags=["Map"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="Adds a new map entry",
 )
 async def insertMap(
@@ -90,7 +90,7 @@ async def insertMap(
     )
     row_count, last_inserted_id = xquery
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id
     )
     if row_count < 1:
@@ -111,7 +111,7 @@ async def insertMap(
     "/surftimer/updateMap",
     name="Update Map",
     tags=["Map"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="This is a single endpoint to update the data of the map, we will always update `stages`, `bonuses` values (full update) instead of the current way the plugin does it (full or partial update).",
 )
 async def updateMapTier(
@@ -139,7 +139,7 @@ async def updateMapTier(
     )
     row_count, last_inserted_id = xquery
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id
     )
     if row_count < 1:

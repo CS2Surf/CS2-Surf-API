@@ -63,7 +63,7 @@ async def getPlayerProfileData(
     "/surftimer/insertplayer",
     name="Insert Player",
     tags=["Player Profile"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="Adds a new player profile entry",
 )
 async def insertPlayer(
@@ -96,7 +96,7 @@ async def insertPlayer(
     )
     row_count, last_inserted_id = xquery
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id
     )
     if row_count < 1:
@@ -117,7 +117,7 @@ async def insertPlayer(
     "/surftimer/updateplayerprofile",
     name="Update Player Profile",
     tags=["Player Profile"],
-    response_model=PostResponeData,
+    response_model=PostResponseData,
     summary="Update the already existing player profile",
 )
 async def updatePlayerProfile(
@@ -147,7 +147,7 @@ async def updatePlayerProfile(
     )
     row_count, last_inserted_id = xquery
 
-    content_data = PostResponeData(
+    content_data = PostResponseData(
         row_count, time.perf_counter() - tic, last_inserted_id
     )
     if row_count < 1:
