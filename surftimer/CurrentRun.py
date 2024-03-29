@@ -74,7 +74,7 @@ async def saveMapTime(
     trx = executeTransaction(checkpoint_queries)
 
     content_data = PostResponseData(
-        row_count, time.perf_counter() - tic, last_inserted_id, trx
+        inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id, trx=trx
     )
     if row_count < 1:
         response.headers["content-type"] = "application/json"
@@ -85,7 +85,7 @@ async def saveMapTime(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode("utf-8")
+    response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -132,7 +132,7 @@ async def saveStageTime(
     row_count, last_inserted_id = xquery
 
     content_data = PostResponseData(
-        row_count, time.perf_counter() - tic, last_inserted_id
+        inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id
     )
     if row_count < 1:
         response.headers["content-type"] = "application/json"
@@ -143,7 +143,7 @@ async def saveStageTime(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode("utf-8")
+    response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -189,7 +189,7 @@ async def saveBonusTime(
     row_count, last_inserted_id = xquery
 
     content_data = PostResponseData(
-        row_count, time.perf_counter() - tic, last_inserted_id
+        inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id
     )
     if row_count < 1:
         response.headers["content-type"] = "application/json"
@@ -200,6 +200,6 @@ async def saveBonusTime(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode("utf-8")
+    response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response

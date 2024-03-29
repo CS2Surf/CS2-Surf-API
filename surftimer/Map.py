@@ -91,7 +91,7 @@ async def insertMap(
     row_count, last_inserted_id = xquery
 
     content_data = PostResponseData(
-        row_count, time.perf_counter() - tic, last_inserted_id
+        inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id
     )
     if row_count < 1:
         response.headers["content-type"] = "application/json"
@@ -102,7 +102,7 @@ async def insertMap(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode("utf-8")
+    response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
 
@@ -140,7 +140,7 @@ async def updateMapTier(
     row_count, last_inserted_id = xquery
 
     content_data = PostResponseData(
-        row_count, time.perf_counter() - tic, last_inserted_id
+        inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id
     )
     if row_count < 1:
         # response.body = json.dumps(content_data).encode('utf-8')
@@ -152,7 +152,7 @@ async def updateMapTier(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
-    response.body = json.dumps(content_data).encode("utf-8")
+    response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.headers["content-type"] = "application/json"
     response.status_code = status.HTTP_200_OK
     return response
