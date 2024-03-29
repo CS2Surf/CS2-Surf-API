@@ -163,7 +163,7 @@ async def updateMapTier(
     name="Get Map Runs Data",
     tags=["Map"],
     summary="All the runs for the given **MapID**, **Style** and **Type** combo.",
-    response_model=List[Dict[str, Any]]
+    response_model=List[Dict[str, Any]],
 )
 async def selectMapRunsData(
     request: Request,
@@ -222,4 +222,57 @@ async def selectMapRunsData(
 
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
+    return xquery
+
+
+@router.get(
+    "/surftimer/maptotals",
+    name="Get Map Record and Totals",
+    tags=["Map"],
+    summary="All map records and totals for the given **MapID** and **Style** combo.",
+)
+async def selectMapRecordAndTotals(
+    request: Request,
+    response: Response,
+    map_id: int,
+    style: int = 0,
+):
+    """
+    ```
+    // Get map world records
+    Task<MySqlDataReader> reader = DB.Query($@"
+        SELECT MapTimes.*, Player.name
+        FROM MapTimes
+        JOIN Player ON MapTimes.player_id = Player.id
+        WHERE MapTimes.map_id = {this.ID} AND MapTimes.style = {style}
+        ORDER BY MapTimes.run_time ASC;
+    ");
+    ```
+    """
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectMapRecordAndTotals:{map_id}-{style}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(surftimer.queries.sql_getMapRecordAndTotals.format(map_id, style))
+
+    if not xquery:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
     return xquery
