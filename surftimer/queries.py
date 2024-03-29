@@ -45,4 +45,4 @@ sql_insertPlayerProfile = """INSERT INTO `Player` (`name`, `steam_id`, `country`
                             VALUES ('{MySqlHelper.EscapeString(name)}', {}, '{}', {}, {}, {});"""
 sql_updatePlayerProfile = """UPDATE `Player` SET country = '{}', 
                             `last_seen` = {}, `connections` = `connections` + 1 
-                            WHERE `id` = {} eeeeeeeee;"""
+                            WHERE `id` = {};"""
