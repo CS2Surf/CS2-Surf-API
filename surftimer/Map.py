@@ -102,6 +102,7 @@ async def insertMap(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
+    response.headers["content-type"] = "application/json"
     response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
@@ -283,6 +284,7 @@ async def selectMapRecordAndTotals(
     name="Get Map Checkpoints Data",
     tags=["Map"],
     summary="All map checkpoints data for the given **MapTime_ID**.",
+    response_model=List[Dict[str, Any]],
 )
 async def selectMapCheckpointsData(
     request: Request,

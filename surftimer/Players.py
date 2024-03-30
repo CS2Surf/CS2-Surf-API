@@ -108,6 +108,7 @@ async def insertPlayer(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
+    response.headers["content-type"] = "application/json"
     response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response

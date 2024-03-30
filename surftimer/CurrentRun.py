@@ -52,26 +52,28 @@ async def saveMapTime(
     row_count, last_inserted_id = xquery
 
     # Now we have the `maptime_id` here we will add the checkpoints
-    checkpoint_queries = []
-    for checkpoint in data.checkpoints:
-        cpquery = surftimer.queries.sql_insertCheckpoint.format(
-            last_inserted_id,
-            checkpoint.cp,
-            checkpoint.run_time,
-            checkpoint.start_vel_x,
-            checkpoint.start_vel_y,
-            checkpoint.start_vel_z,
-            checkpoint.end_vel_x,
-            checkpoint.end_vel_y,
-            checkpoint.end_vel_z,
-            checkpoint.attempts,
-            checkpoint.end_touch,
-        )
+    trx = None
+    if data.checkpoints is not None:
+        checkpoint_queries = []
+        for checkpoint in data.checkpoints:
+            cpquery = surftimer.queries.sql_insertCheckpoint.format(
+                last_inserted_id,
+                checkpoint.cp,
+                checkpoint.run_time,
+                checkpoint.start_vel_x,
+                checkpoint.start_vel_y,
+                checkpoint.start_vel_z,
+                checkpoint.end_vel_x,
+                checkpoint.end_vel_y,
+                checkpoint.end_vel_z,
+                checkpoint.attempts,
+                checkpoint.end_touch,
+            )
 
-        checkpoint_queries.append(cpquery)
+            checkpoint_queries.append(cpquery)
 
-    # Start the transaction with all checkpoints
-    trx = executeTransaction(checkpoint_queries)
+        # Start the transaction with all checkpoints
+        trx = executeTransaction(checkpoint_queries)
 
     content_data = PostResponseData(
         inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id, trx=trx
@@ -85,6 +87,7 @@ async def saveMapTime(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
+    response.headers["content-type"] = "application/json"
     response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
@@ -143,6 +146,7 @@ async def saveStageTime(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
+    response.headers["content-type"] = "application/json"
     response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
@@ -200,6 +204,7 @@ async def saveBonusTime(
     toc = time.perf_counter()
     print(f"Execution time {toc - tic:0.4f}")
 
+    response.headers["content-type"] = "application/json"
     response.body = json.dumps(content_data.model_dump()).encode("utf-8")
     response.status_code = status.HTTP_201_CREATED
     return response
