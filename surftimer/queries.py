@@ -24,6 +24,7 @@ sql_getPlayerMapData = """SELECT mainquery.*, (SELECT COUNT(*) FROM `MapTimes` A
                         WHERE subquery.`map_id` = mainquery.`map_id` AND subquery.`style` = mainquery.`style` 
                         AND subquery.`run_time` <= mainquery.`run_time`) AS `rank` FROM `MapTimes` AS mainquery 
                         WHERE mainquery.`player_id` = {} AND mainquery.`map_id` = {};"""
+sql_getSpecificPlayerStatsData = """SELECT * FROM `MapTimes` WHERE `player_id` = {} AND `map_id` = {} AND `style` = {} AND `type` = {};"""
 
 ####################
 ## CurrentRun.cs ##
