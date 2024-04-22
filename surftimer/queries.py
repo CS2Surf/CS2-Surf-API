@@ -15,6 +15,22 @@ sql_getMapRecordAndTotals = """SELECT MapTimes.*, Player.name
                             JOIN Player ON MapTimes.player_id = Player.id
                             WHERE MapTimes.map_id = {} AND MapTimes.style = {}
                             ORDER BY MapTimes.run_time ASC;"""
+# This one might cause issues if DB is large - revisit later
+sql_getDataByRank = """SELECT mainquery.* FROM MapTimes AS mainquery
+                    WHERE
+                        mainquery.map_id = {}
+                        AND mainquery.style = {}
+                        AND mainquery.type = {}
+                        AND mainquery.stage = {}
+                        AND (
+                            SELECT COUNT(*) FROM MapTimes AS subquery
+                            WHERE
+                                subquery.map_id = mainquery.map_id
+                                AND subquery.style = mainquery.style
+                                AND subquery.type = mainquery.type
+                                AND subquery.stage = mainquery.stage
+                                AND subquery.run_time <= mainquery.run_time
+                        ) = {};"""
 
 
 ####################

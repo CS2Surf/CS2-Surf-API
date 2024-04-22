@@ -110,9 +110,13 @@ async def getPlayerSpecificData(
     else:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
-    
+
     if type == 0:
-        for item in xquery: # Technically we would only have one item in this list as a player can only have 1 entry for the `type` and `style` combo
+        for (
+            item
+        ) in (
+            xquery
+        ):  # Technically we would only have one item in this list as a player can only have 1 entry for the `type` and `style` combo
             # Execute query to fetch checkpoints using the id from the current item
             checkpoints = selectQuery(
                 surftimer.queries.sql_getMapCheckpointsData.format(item["id"])
@@ -120,6 +124,170 @@ async def getPlayerSpecificData(
 
             # Append checkpoints to the current item
             item["checkpoints"] = checkpoints
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getmaprunbyrank",
+    name="Get The Specified Rank Map Run Data",
+    tags=["Player Stats"],
+    summary="Get the run data for the specified rank on the map.",
+    response_model=Dict[str, Any],
+)
+async def selectMapRunByRank(
+    request: Request,
+    response: Response,
+    map_id: int,
+    style: int,
+    rank: int,
+):
+    """
+    Gets the map run data for the specified rank on the specified map and style.
+    """
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectMapRunByRank:{map_id}-{style}-0-0-{rank}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_getDataByRank.format(map_id, style, 0, 0, rank)
+    )
+
+    if not xquery:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+    else:
+        for (
+            item
+        ) in (
+            xquery
+        ):  # Technically we would only have one item in this list as a player can only have 1 entry for the `type` and `style` combo
+            # Execute query to fetch checkpoints using the id from the current item
+            checkpoints = selectQuery(
+                surftimer.queries.sql_getMapCheckpointsData.format(item["id"])
+            )
+
+            # Append checkpoints to the current item
+            item["checkpoints"] = checkpoints
+        xquery = xquery.pop()
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getbonusrunbyrank",
+    name="Get The Specified Rank Bonus Run Data",
+    tags=["Player Stats"],
+    summary="Get the bonus run data for the specified rank on the map.",
+    response_model=Dict[str, Any],
+)
+async def selectBonusRunByRank(
+    request: Request,
+    response: Response,
+    map_id: int,
+    style: int,
+    rank: int,
+    bonus: int,
+):
+    """
+    Gets the bonus run data for the specified rank on the specified map and style.
+    """
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectBonusRunByRank:{map_id}-{style}-1-{bonus}-{rank}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_getDataByRank.format(map_id, style, 1, bonus, rank)
+    )
+
+    if not xquery:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+    else:
+        xquery = xquery.pop()
+
+    # Cache the data in Redis
+    set_cache(cache_key, xquery)
+
+    toc = time.perf_counter()
+
+    print(f"Execution time {toc - tic:0.4f}")
+
+    return xquery
+
+
+@router.get(
+    "/surftimer/getstagerunbyrank",
+    name="Get The Specified Rank Stage Run Data",
+    tags=["Player Stats"],
+    summary="Get the stage run data for the specified rank on the map.",
+    response_model=Dict[str, Any],
+)
+async def selectStageRunByRank(
+    request: Request,
+    response: Response,
+    map_id: int,
+    style: int,
+    rank: int,
+    stage: int,
+):
+    """
+    Gets the stage run data for the specified rank on the specified map and style.
+    """
+    tic = time.perf_counter()
+
+    # Check if data is cached in Redis
+    cache_key = f"selectStageRunByRank:{map_id}-{style}-2-{stage}-{rank}"
+    cached_data = get_cache(cache_key)
+    if cached_data is not None:
+        print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_200_OK
+        response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
+        return response
+
+    xquery = selectQuery(
+        surftimer.queries.sql_getDataByRank.format(map_id, style, 2, stage, rank)
+    )
+
+    if not xquery:
+        response.headers["content-type"] = "application/json"
+        response.status_code = status.HTTP_204_NO_CONTENT
+        return response
+    else:
+        xquery = xquery.pop()
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
