@@ -110,6 +110,16 @@ async def getPlayerSpecificData(
     else:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
+    
+    if type == 0:
+        for item in xquery: # Technically we would only have one item in this list as a player can only have 1 entry for the `type` and `style` combo
+            # Execute query to fetch checkpoints using the id from the current item
+            checkpoints = selectQuery(
+                surftimer.queries.sql_getMapCheckpointsData.format(item["id"])
+            )
+
+            # Append checkpoints to the current item
+            item["checkpoints"] = checkpoints
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
