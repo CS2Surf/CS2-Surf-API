@@ -16,7 +16,9 @@ sql_getMapRecordAndTotals = """SELECT MapTimes.*, Player.name
                             WHERE MapTimes.map_id = {} AND MapTimes.style = {}
                             ORDER BY MapTimes.run_time ASC;"""
 # This one might cause issues if DB is large - revisit later
-sql_getDataByRank = """SELECT mainquery.* FROM MapTimes AS mainquery
+sql_getDataByRank = """SELECT Player.name, mainquery.* FROM MapTimes AS mainquery
+                    INNER JOIN Player ON 
+                        mainquery.player_id = Player.id
                     WHERE
                         mainquery.map_id = {}
                         AND mainquery.style = {}
