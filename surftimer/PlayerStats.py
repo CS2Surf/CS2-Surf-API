@@ -82,7 +82,10 @@ async def getPlayerSpecificData(
     type: int,
 ):
     """
-    # **All** data for the player runs on a map.
+    # **Type** mapping/logic:
+    ## 0 = map time;
+    ## 1 = bonus time (`stage` signifies bonus number);
+    ## 2 = stage time (`stage` signifies stage number);
     """
     tic = time.perf_counter()
 
