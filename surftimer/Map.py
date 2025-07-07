@@ -23,7 +23,11 @@ async def selectMapInfo(
     response: Response,
     mapname: str,
 ):
-    """`Task<MySqlDataReader> reader = DB.Query($"SELECT * FROM Maps WHERE name='{MySqlHelper.EscapeString(Name)}'");`"""
+    """
+    ```
+        GetMapInfoAsync
+    ```
+    """
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
@@ -53,6 +57,7 @@ async def selectMapInfo(
     print(f"Execution time {toc - tic:0.4f}")
 
     response_data = MapInfoModel(**xquery).model_dump()
+
     return JSONResponse(content=response_data)
 
 
@@ -68,9 +73,9 @@ async def insertMap(
     response: Response,
     data: MapInfoModel,
 ):
-    """```c
-    Task<int> writer = DB.Write($"INSERT INTO Maps (name, author, tier, stages, ranked, date_added, last_played) VALUES ('{MySqlHelper.EscapeString(Name)}', 'Unknown', {this.Stages}, {this.Bonuses}, 0, {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()})");
-    ....
+    """
+    ```
+        InsertMapInfoAsync
     ```
     `date_added` and `last_played` values are automatically populated from the API as UNIX timestamps
     """
@@ -122,9 +127,8 @@ async def updateMapTier(
 ):
     """
     # **id** is required here (maptime_id)
-    ```c
-    $"UPDATE Maps SET last_played={(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, stages={this.Stages}, bonuses={this.Bonuses} WHERE id={this.ID}";
-    ....
+    ```
+        UpdateMapInfoAsync
     ```
     `last_played` value is automatically populated from the API as UNIX timestamp.\n
     """
@@ -163,37 +167,25 @@ async def updateMapTier(
     "/surftimer/maprunsdata",
     name="Get Map Runs Data",
     tags=["Map"],
-    summary="All the runs for the given **MapID**, **Style** and **Type** combo.",
+    summary="All the runs for the given **MapID**.",
     response_model=List[Dict[str, Any]],
 )
 async def selectMapRunsData(
     request: Request,
     response: Response,
     id: int,
-    style: int,
-    type: int,
+    # style: int,
+    # type: int,
 ):
     """
-    # **Type** is now required
-    ## 0 = map time;
-    ## 1 = bonus time (`stage` signifies bonus number);
-    ## 2 = stage time (`stage` signifies stage number);
     ```
-    // Get map world records
-    Task<MySqlDataReader> reader = DB.Query($@"
-        SELECT MapTimes.*, Player.name
-        FROM MapTimes
-        JOIN Player ON MapTimes.player_id = Player.id
-        WHERE MapTimes.map_id = {this.ID} AND MapTimes.style = {style}
-        ORDER BY MapTimes.run_time ASC;
-    ");
+        GetMapRecordRunsAsync
     ```
-    This also includes the `Checkpoints` data for each of the runs if the **type** is **0**.
     """
     tic = time.perf_counter()
 
     # Check if data is cached in Redis
-    cache_key = f"selectMapRunsData:{id}-{style}-{type}"
+    cache_key = f"selectMapRunsData:{id}"
     cached_data = get_cache(cache_key)
     if cached_data is not None:
         print(f"[Redis] Loaded '{cache_key}' ({time.perf_counter() - tic:0.4f}s)")
@@ -202,21 +194,12 @@ async def selectMapRunsData(
         response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
         return response
 
-    xquery = selectQuery(surftimer.queries.sql_getMapRunsData.format(id, style, type))
+    # xquery = selectQuery(surftimer.queries.sql_getMapRunsData.format(id, style, type))
+    xquery = selectQuery(surftimer.queries.sql_getMapRunsData.format(id))
 
     if not xquery:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
-
-    if type == 0:  # 0 = map times
-        for item in xquery:
-            # Execute query to fetch checkpoints using the id from the current item
-            checkpoints = selectQuery(
-                surftimer.queries.sql_getMapCheckpointsData.format(item["id"])
-            )
-
-            # Append checkpoints to the current item
-            item["checkpoints"] = checkpoints
 
     # Cache the data in Redis
     set_cache(cache_key, xquery)
@@ -239,16 +222,7 @@ async def selectMapRecordAndTotals(
     style: int = 0,
 ):
     """
-    ```
-    // Get map world records
-    Task<MySqlDataReader> reader = DB.Query($@"
-        SELECT MapTimes.*, Player.name
-        FROM MapTimes
-        JOIN Player ON MapTimes.player_id = Player.id
-        WHERE MapTimes.map_id = {this.ID} AND MapTimes.style = {style}
-        ORDER BY MapTimes.run_time ASC;
-    ");
-    ```
+    ***NOT USED*** in plugin
     """
     tic = time.perf_counter()
 
@@ -262,7 +236,9 @@ async def selectMapRecordAndTotals(
         response.body = json.loads(cached_data, use_decimal=True, parse_nan=True)
         return response
 
-    xquery = selectQuery(surftimer.queries.sql_getMapRecordAndTotals.format(map_id, style))
+    xquery = selectQuery(
+        surftimer.queries.sql_getMapRecordAndTotals.format(map_id, style)
+    )
 
     if not xquery:
         response.headers["content-type"] = "application/json"
@@ -282,7 +258,7 @@ async def selectMapRecordAndTotals(
 @router.get(
     "/surftimer/mapcheckpointsdata",
     name="Get Map Checkpoints Data",
-    tags=["Map"],
+    tags=["Map", "Personal Best"],
     summary="All map checkpoints data for the given **MapTime_ID**.",
     response_model=List[Dict[str, Any]],
 )
@@ -293,7 +269,7 @@ async def selectMapCheckpointsData(
 ):
     """
     ```
-
+        LoadCheckpointsAsync
     ```
     """
     tic = time.perf_counter()

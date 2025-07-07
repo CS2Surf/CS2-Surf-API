@@ -26,6 +26,7 @@ from surftimer.Map import router as Map
 from surftimer.PlayerStats import router as PlayerStats
 from surftimer.CurrentRun import router as CurrentRun
 from surftimer.Players import router as Players
+from surftimer.PersonalBest import router as PersonalBest
 
 
 class IPValidatorMiddleware(BaseHTTPMiddleware):
@@ -78,6 +79,7 @@ app.include_router(Map)
 app.include_router(PlayerStats)
 app.include_router(CurrentRun)
 app.include_router(Players)
+app.include_router(PersonalBest)
 
 
 @app.get("/docs2", include_in_schema=False)

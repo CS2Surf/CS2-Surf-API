@@ -24,11 +24,28 @@ async def saveMapTime(
     data: CurrentRun,
 ):
     """
+    ```
+        InsertMapTimeAsync
+    ```
     `run_date` value is automatically populated from the API as UNIX timestamp
     """
     tic = time.perf_counter()
 
-    # print(data)
+    # print(
+    #     f"Sending CurrentRun:\n"
+    #     f" player_id: {data.player_id}\n"
+    #     f" map_id: {data.map_id}\n"
+    #     f" run_time: {data.run_time}\n"
+    #     f" style: {data.style}\n"
+    #     f" type: {data.type}\n"
+    #     f" stage: {data.stage}\n"
+    #     f" start_vel: ({data.start_vel_x}, {data.start_vel_y}, {data.start_vel_z})\n"
+    #     f" end_vel: ({data.end_vel_x}, {data.end_vel_y}, {data.end_vel_z})\n"
+    #     f" replay_frames length: {len(data.replay_frames) if data.replay_frames else 0}\n"
+    #     f" checkpoints count: {len(data.checkpoints) if data.checkpoints else 0}\n"
+    #     f" run_date: {data.run_date}"
+    # )
+
     # return data
 
     xquery = insertQuery(
@@ -36,7 +53,8 @@ async def saveMapTime(
             data.player_id,
             data.map_id,
             data.style,
-            0, # Hardcoding type = 0 to signify that this is a Map Run Time
+            # 0,  # Hardcoding type = 0 to signify that this is a Map Run Time
+            data.type,  # Hardcoding type = 0 to signify that this is a Map Run Time
             data.stage,
             data.run_time,
             data.start_vel_x,
@@ -53,7 +71,7 @@ async def saveMapTime(
 
     # Now we have the `maptime_id` here we will add the checkpoints
     trx = None
-    if data.checkpoints is not None:
+    if data.checkpoints is not None and data.type == 0:
         checkpoint_queries = []
         for checkpoint in data.checkpoints:
             cpquery = surftimer.queries.sql_insertCheckpoint.format(
@@ -76,7 +94,10 @@ async def saveMapTime(
         trx = executeTransaction(checkpoint_queries)
 
     content_data = PostResponseData(
-        inserted=row_count, xtime=time.perf_counter() - tic, last_id=last_inserted_id, trx=trx
+        inserted=row_count,
+        xtime=time.perf_counter() - tic,
+        last_id=last_inserted_id,
+        trx=trx,
     )
     if row_count < 1:
         response.headers["content-type"] = "application/json"
@@ -151,6 +172,7 @@ async def saveStageTime(
     response.status_code = status.HTTP_201_CREATED
     return response
 
+
 @router.post(
     "/surftimer/savebonustime",
     name="Save Bonus Time",
@@ -178,7 +200,7 @@ async def saveBonusTime(
             data.map_id,
             data.style,
             1,  # Hardcoding type = 1 to signify that this is a Bonus Run Time
-            data.stage, # This represents the bonus number
+            data.stage,  # This represents the bonus number
             data.run_time,
             data.start_vel_x,
             data.start_vel_y,

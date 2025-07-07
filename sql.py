@@ -13,6 +13,7 @@ def selectQuery(query):
     db = config["DATABASE"]
     mydb = mysql.connector.connect(
         host=db["HOST"],
+        port=db["PORT"],
         user=db["USERNAME"],
         password=db["PASSWORD"],
         database=db["DB"],
@@ -33,6 +34,7 @@ def insertQuery(query):
     db = config["DATABASE"]
     mydb = mysql.connector.connect(
         host=db["HOST"],
+        port=db["PORT"],
         user=db["USERNAME"],
         password=db["PASSWORD"],
         database=db["DB"],
@@ -55,6 +57,7 @@ def insertEscapedQuery(query):
     db = config["DATABASE"]
     mydb = mysql.connector.connect(
         host=db["HOST"],
+        port=db["PORT"],
         user=db["USERNAME"],
         password=db["PASSWORD"],
         database=db["DB"],
@@ -76,6 +79,7 @@ def executeTransaction(queries):
     db_config = config["DATABASE"]
     mydb = mysql.connector.connect(
         host=db_config["HOST"],
+        port=db_config["PORT"],
         user=db_config["USERNAME"],
         password=db_config["PASSWORD"],
         database=db_config["DB"],

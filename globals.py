@@ -45,6 +45,10 @@ tags_metadata = [
         "name": "Player Profile",
         "description": "All queries from the `Players.cs` file.",
     },
+    {
+        "name": "Personal Best",
+        "description": "All queries from the `PersonalBest.cs` file.",
+    },
 ]
 
 # Whitelisted IPs

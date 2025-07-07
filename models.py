@@ -10,14 +10,14 @@ class PostResponseData(BaseModel):
     inserted: int
     xtime: float
     last_id: Optional[int] = None
-    trx: Optional[int] = None
+    trx: Optional[List[int]] = None
 
 
 class Checkpoint(BaseModel):
     """Body for adding or updating **Checkpoints** table entry"""
 
     cp: int
-    ticks: int
+    run_time: int
     start_vel_x: Decimal
     start_vel_y: Decimal
     start_vel_z: Decimal
@@ -43,14 +43,16 @@ class CurrentRun(BaseModel):
     style: int = 0
     type: int = 0
     stage: int = 0
-    checkpoints: Optional[List[Checkpoint]] = None  # Required when adding a Map Run Time (type = 0)
+    checkpoints: Optional[List[Checkpoint]] = (
+        None  # Required when adding a Map Run Time (type = 0)
+    )
     replay_frames: str
     run_date: Optional[int] = None
 
     @validator("run_date", pre=True, always=True)
     def default_timestamp(cls, v):
         """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
-        if v is None:
+        if v is None or v == 0:
             return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         return v
 
@@ -71,7 +73,7 @@ class MapInfoModel(BaseModel):
     @validator("date_added", "last_played", pre=True, always=True)
     def default_timestamp(cls, v):
         """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
-        if v is None:
+        if v is None or v == 0:
             return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         return v
 
@@ -79,6 +81,7 @@ class MapInfoModel(BaseModel):
 class PlayerSurfProfile(BaseModel):
     """Model for player profiles"""
 
+    id: int
     name: str
     steam_id: int
     country: str
@@ -89,6 +92,6 @@ class PlayerSurfProfile(BaseModel):
     @validator("join_date", "last_seen", pre=True, always=True)
     def default_timestamp(cls, v):
         """Automatically add the `UNIX` timestamps so we don't need to include them in the Body of the API call"""
-        if v is None:
+        if v is None or v == 0:
             return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         return v

@@ -24,6 +24,10 @@ async def getPlayerMapData(
 ):
     """
     # **All** data for the player runs on a map.
+
+    ```
+        GetPlayerMapTimesAsync
+    ```
     """
     tic = time.perf_counter()
 
@@ -82,6 +86,8 @@ async def getPlayerSpecificData(
     type: int,
 ):
     """
+    # NOT USED
+
     # **Type** mapping/logic:
     ## 0 = map time;
     ## 1 = bonus time (`stage` signifies bonus number);
@@ -150,6 +156,8 @@ async def selectMapRunByRank(
     rank: int,
 ):
     """
+    # NOT USED
+
     Gets the map run data for the specified rank on the specified map and style.
     """
     tic = time.perf_counter()
@@ -213,6 +221,8 @@ async def selectBonusRunByRank(
     bonus: int,
 ):
     """
+    # NOT USED
+
     Gets the bonus run data for the specified rank on the specified map and style.
     """
     tic = time.perf_counter()
@@ -264,6 +274,8 @@ async def selectStageRunByRank(
     stage: int,
 ):
     """
+    # NOT USED
+
     Gets the stage run data for the specified rank on the specified map and style.
     """
     tic = time.perf_counter()

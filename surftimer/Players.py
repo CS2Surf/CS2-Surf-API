@@ -24,7 +24,7 @@ async def getPlayerProfileData(
 ):
     """
     ```
-    Task<MySqlDataReader> dbTask = DB.Query($"SELECT * FROM `Player` WHERE `steam_id` = {player.SteamID} LIMIT 1;");
+        GetPlayerProfileAsync
     ```
     """
     tic = time.perf_counter()
@@ -72,14 +72,10 @@ async def insertPlayer(
     data: PlayerSurfProfile,
 ):
     """
-    ```c
-    // Write new player to database
-    Task<int> newPlayerTask = DB.Write($@"
-        INSERT INTO `Player` (`name`, `steam_id`, `country`, `join_date`, `last_seen`, `connections`)
-        VALUES ('{MySqlHelper.EscapeString(name)}', {player.SteamID}, '{country}', {joinDate}, {lastSeen}, {connections});
-    ");
-    ....
     ```
+        InsertPlayerProfileAsync
+    ```
+
     `join_date` and `last_seen` values are automatically populated from the API as UNIX timestamps
     """
     tic = time.perf_counter()
@@ -124,26 +120,25 @@ async def insertPlayer(
 async def updatePlayerProfile(
     request: Request,
     response: Response,
-    country: str,
-    id: int,
+    data: PlayerSurfProfile,
+    # country: str,
+    # id: int,
 ):
-    """```c
-    // Update data in Player DB table
-    Task<int> updatePlayerTask = DB.Write($@"
-        UPDATE `Player` SET country = '{playerList[player.UserId ?? 0].Profile.Country}',
-        `last_seen` = {(int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()}, `connections` = `connections` + 1
-        WHERE `id` = {playerList[player.UserId ?? 0].Profile.ID} LIMIT 1;
-    ");
-    ....
+    """
     ```
+        UpdatePlayerProfileAsync
+    ```
+
     `last_played` value is automatically populated from the API as UNIX timestamp.\n
-    `id` is required here.
+    `id` is **required** here.
     """
     tic = time.perf_counter()
 
     xquery = insertQuery(
         surftimer.queries.sql_updatePlayerProfile.format(
-            country,
+            data.country,
+            data.last_seen,
+            data.id,
         )
     )
     row_count, last_inserted_id = xquery

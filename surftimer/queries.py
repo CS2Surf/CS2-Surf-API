@@ -5,10 +5,23 @@ sql_getMapInfo = "SELECT * FROM Maps WHERE name='{}';"
 sql_insertMap = """INSERT INTO Maps (name, author, tier, stages, bonuses, ranked, date_added, last_played) 
                 VALUES ('{}', '{}', {}, {}, {}, {}, {}, {});"""
 sql_updateMap = """UPDATE Maps SET last_played={}, stages={}, bonuses={} WHERE id={};"""
-sql_getMapRunsData = """SELECT MapTimes.*, Player.name FROM MapTimes
-                    JOIN Player ON MapTimes.player_id = Player.id
-                    WHERE MapTimes.map_id = {} AND MapTimes.style = {} AND MapTimes.type = {}
-                    ORDER BY MapTimes.run_time ASC;"""
+sql_getMapRunsData = """
+                            SELECT 
+                                ranked_times.*
+                            FROM (
+                                SELECT 
+                                    MapTimes.*,
+                                    Player.name,
+                                    ROW_NUMBER() OVER (
+                                        PARTITION BY MapTimes.type, MapTimes.stage 
+                                        ORDER BY MapTimes.run_time ASC
+                                    ) AS row_num,
+                                    COUNT(*) OVER (PARTITION BY MapTimes.type, MapTimes.stage) AS total_count
+                                FROM MapTimes
+                                JOIN Player ON MapTimes.player_id = Player.id
+                                WHERE MapTimes.map_id = {}
+                            ) AS ranked_times
+                            WHERE ranked_times.row_num = 1;"""
 sql_getMapCheckpointsData = "SELECT * FROM `Checkpoints` WHERE `maptime_id` = {};"
 sql_getMapRecordAndTotals = """SELECT MapTimes.*, Player.name
                             FROM MapTimes
@@ -40,9 +53,9 @@ sql_getDataByRank = """SELECT Player.name, mainquery.* FROM MapTimes AS mainquer
 ####################
 sql_getPlayerMapData = """SELECT mainquery.*, (SELECT COUNT(*) FROM `MapTimes` AS subquery 
                         WHERE subquery.`map_id` = mainquery.`map_id` AND subquery.`style` = mainquery.`style` 
-                        AND subquery.`run_time` <= mainquery.`run_time`) AS `rank` FROM `MapTimes` AS mainquery 
+                        AND subquery.`run_time` <= mainquery.`run_time` AND subquery.`type` = mainquery.`type` AND subquery.`stage` = mainquery.`stage`) AS `rank` FROM `MapTimes` AS mainquery 
                         WHERE mainquery.`player_id` = {} AND mainquery.`map_id` = {};"""
-sql_getSpecificPlayerStatsData = """SELECT * FROM `MapTimes` WHERE `player_id` = {} AND `map_id` = {} AND `style` = {} AND `type` = {};"""
+sql_getSpecificPlayerStatsData = """SELECT * FROM `MapTimes` WHERE `player_id` = {} AND `map_id` = {} AND `style` = {} AND `type` = {};"""  # Can be replaced with sql_getRunByPlayer
 
 ####################
 ## CurrentRun.cs ##
@@ -71,3 +84,16 @@ sql_insertPlayerProfile = """INSERT INTO `Player` (`name`, `steam_id`, `country`
 sql_updatePlayerProfile = """UPDATE `Player` SET country = '{}', 
                             `last_seen` = {}, `connections` = `connections` + 1 
                             WHERE `id` = {};"""
+
+
+#########################
+##   PersonalBest.cs   ##
+#########################
+sql_getRunByPlayer = """SELECT mainquery.*, (SELECT COUNT(*) FROM `MapTimes` AS subquery 
+                        WHERE subquery.`map_id` = mainquery.`map_id` AND subquery.`style` = mainquery.`style` 
+                        AND subquery.`run_time` <= mainquery.`run_time` AND subquery.`type` = mainquery.`type` AND subquery.`stage` = mainquery.`stage`) AS `rank` FROM `MapTimes` AS mainquery 
+                        WHERE mainquery.`player_id` = {} AND mainquery.`map_id` = {} AND mainquery.`type` = {} AND mainquery.`style` = {};"""
+sql_getRunById = """SELECT mainquery.*, (SELECT COUNT(*) FROM `MapTimes` AS subquery 
+                    WHERE subquery.`map_id` = mainquery.`map_id` AND subquery.`style` = mainquery.`style` 
+                    AND subquery.`run_time` <= mainquery.`run_time` AND subquery.`type` = mainquery.`type` AND subquery.`stage` = mainquery.`stage`) AS `rank` FROM `MapTimes` AS mainquery 
+                    WHERE mainquery.`id` = {};"""
