@@ -77,6 +77,10 @@ class MapInfoModel(BaseModel):
             return int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         return v
 
+    @validator("ranked", pre=True)
+    def ranked_bool_to_int(cls, v):
+        return int(v)  # True -> 1, False -> 0, or passthrough if already int
+
 
 class PlayerSurfProfile(BaseModel):
     """Model for player profiles"""

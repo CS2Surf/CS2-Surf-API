@@ -139,6 +139,9 @@ async def updateMapTier(
             data.last_played,
             data.stages,
             data.bonuses,
+            data.author,
+            data.tier,
+            data.ranked,
             data.id,
         )
     )
