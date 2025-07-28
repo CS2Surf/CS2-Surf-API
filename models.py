@@ -11,6 +11,7 @@ class PostResponseData(BaseModel):
     xtime: float
     last_id: Optional[int] = None
     trx: Optional[List[int]] = None
+    rank: Optional[int] = None
 
 
 class Checkpoint(BaseModel):

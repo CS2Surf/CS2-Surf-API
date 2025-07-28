@@ -49,6 +49,10 @@ tags_metadata = [
         "name": "Personal Best",
         "description": "All queries from the `PersonalBest.cs` file.",
     },
+    {
+        "name": "Utilities",
+        "description": "Utility endpoints",
+    },
 ]
 
 # Whitelisted IPs

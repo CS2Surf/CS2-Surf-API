@@ -1,5 +1,6 @@
 # IMPORTS
 from datetime import datetime
+import time
 from fastapi import FastAPI, Request, status, Depends, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -97,6 +98,26 @@ async def custom_swagger_ui_html_cdn():
 async def home():
     data = {"message": "Suuuuh duuuud"}
     return JSONResponse(status_code=status.HTTP_200_OK, content=data)
+
+
+@app.get(
+    "/ping",
+    name="Ping",
+    tags=["Utilities"],
+    summary="Endpoint used for checking connection and latency between clients and API",
+)
+def ping(client_unix: float):
+    server_unix = time.time()
+    latency = server_unix - client_unix
+
+    return JSONResponse(
+        content={
+            "client_unix": client_unix,
+            "server_unix": server_unix,
+            "latency_seconds": latency,
+            "latency_ms": round(latency * 1000, 2),
+        }
+    )
 
 
 # This is an example of a endpoint locked behind an AUTH token 👇
